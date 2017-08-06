@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import FotoItem from './FotoItem';
+import PhotoItem from './PhotoItem';
 
 export default class Timeline extends Component {
   constructor() {
@@ -8,7 +8,7 @@ export default class Timeline extends Component {
       photos: []
     };
   }
-  
+
   componentDidMount() {
     fetch('http://localhost:8080/api/public/fotos/alots')
       .then(result => result.json())
@@ -23,11 +23,11 @@ export default class Timeline extends Component {
       <div className="fotos container">
         {
           this.state.photos.map(p => (
-            <FotoItem fotoUrl={p} />
+            <PhotoItem photo={p} />
           ))
         }
-        <FotoItem />
-        <FotoItem />
+        <PhotoItem />
+        <PhotoItem />
       </div>
     );
   }
