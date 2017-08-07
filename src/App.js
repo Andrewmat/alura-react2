@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
-import Timeline from './components/Timeline';
 
 class App extends Component {
   render() {
@@ -8,7 +7,7 @@ class App extends Component {
       <div id="root">
         <div className="main">
           <Header />
-          <Timeline />
+          {this.props.children}
         </div>
       </div>
     );
