@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PubSub from 'pubsub-js';
 
-import { requestServer } from '../utils/Auth';
-
 class PhotoUpdates extends Component {
   constructor(props) {
     super(props);
@@ -12,23 +10,32 @@ class PhotoUpdates extends Component {
     };
   }
 
-  likePhoto(e) {
+  likeEvent(e) {
     e.preventDefault();
-    requestServer(`/fotos/${this.props.photo.id}/like`, { method: 'POST' })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Não foi possível realizar o like na foto');
-        }
-      })
+    this.props.onLike({
+      id: this.props.photo.id
+    })
       .then(liker => {
         this.setState({
           liked: !this.state.liked
         });
         PubSub.publish('photo-like', { id: this.props.photo.id, liker })
       })
-      .catch(error => {
+      .catch(e => {
+        alert(e.message);
+      });
+  }
+
+  commentEvent(e) {
+    e.preventDefault();
+    this.props.onComment({
+      id: this.props.photo.id,
+      comment: this.comment.value
+    })
+      .then(comment => {
+        PubSub.publish('photo-comment', { id: this.props.photo.id, comment });
+      })
+      .catch(e => {
         alert(e.message);
       })
   }
@@ -36,9 +43,9 @@ class PhotoUpdates extends Component {
   render() {
     return (
       <section className="fotoAtualizacoes">
-        <button onClick={this.likePhoto.bind(this)} className={this.state.liked ? 'fotoAtualizacoes-like-ativo' : 'fotoAtualizacoes-like'}>Likar</button>
-        <form className="fotoAtualizacoes-form">
-          <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" />
+        <button onClick={this.likeEvent.bind(this)} className={this.state.liked ? 'fotoAtualizacoes-like-ativo' : 'fotoAtualizacoes-like'}>Likar</button>
+        <form className="fotoAtualizacoes-form" onSubmit={this.commentEvent.bind(this)}>
+          <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" ref={input => this.comment = input} />
           <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
         </form>
       </section>
@@ -50,28 +57,10 @@ class PhotoInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      likers: this.props.photo.likers
+      likers: this.props.photo.likers,
+      comments: this.props.photo.comentarios
     };
     this.subscriptions = [];
-  }
-
-  componentWillMount() {
-    this.subscriptions.push(
-      PubSub.subscribe('photo-like', (topic, likeData) => {
-        if (this.props.photo.id === likeData.id) {
-          let likers;
-          let liker = this.state.likers.find(l => l.login === likeData.liker.login);
-          if (!liker) {
-            likers = this.state.likers.concat(likeData.liker);
-          } else {
-            likers = this.state.likers.filter(l => l.login !== likeData.liker.login);
-
-          }
-          this.setState({ likers });
-
-        }
-      })
-    )
   }
 
   componentWillUnmount() {
@@ -99,9 +88,9 @@ class PhotoInfo extends Component {
 
         <ul className="foto-info-comentarios">
           {
-            this.props.photo.comentarios.map(comment => (
+            this.state.comments.map(comment => (
               <li className="comentario" key={comment.id}>
-                <Link to={`/timeline/comment.login`} className="foto-info-autor">{comment.login}</Link>
+                <Link to={`/timeline/${comment.login}`} className="foto-info-autor">{comment.login}</Link>
                 {comment.texto}
               </li>
             ))
