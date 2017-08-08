@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+
 import PhotoItem from './PhotoItem';
+import { requestServer } from '../utils/Auth';
 
 export default class Timeline extends Component {
   constructor() {
@@ -13,11 +15,11 @@ export default class Timeline extends Component {
   fetchTimelineData() {
     let endpoint;
     if (this.user) {
-      endpoint = `http://localhost:8080/api/public/fotos/${this.user}`;
+      endpoint = `/public/fotos/${this.user}`;
     } else {
-      endpoint = `http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+      endpoint = `/fotos`;
     }
-    fetch(endpoint)
+    requestServer(endpoint)
       .then(result => {
         return result.json();
       })
@@ -28,7 +30,6 @@ export default class Timeline extends Component {
 
   componentDidMount() {
     if (this.props.match && this.props.match.params && this.props.match.params.user) {
-      console.log(2);
       this.user = this.props.match.params.user;
     }
     this.fetchTimelineData();

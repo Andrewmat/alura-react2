@@ -80,7 +80,7 @@ body {
   text-decoration: none;
   color: #069;
   font-size: 3em;
-}    
+}
 
 .header-nav-item a:hover{
   color: #5ad4c9;
@@ -95,7 +95,7 @@ body {
   border-radius: 3px;
   max-width: 550px;
   margin: 2em auto;
-  
+
 }
 
 .foto-header {
@@ -183,6 +183,7 @@ body {
 .fotoAtualizacoes-like {
   background: url(../imgs/s2.png) no-repeat center center;
   background-size: 32px 32px;
+  border: none;
   width: 44px;
   height: 44px;
   text-indent: -9999px;
@@ -194,6 +195,7 @@ body {
 .fotoAtualizacoes-like-ativo {
   background: url(../imgs/s2-check.png) no-repeat center center;
   background-size: 32px 32px;
+  border: none;
   width: 44px;
   height: 44px;
   text-indent: -9999px;
@@ -237,4 +239,4 @@ body {
 .timeline-leave.timeline-leave-active {
   opacity: 0.01;
   transition: opacity 300ms ease-in;
-}      
+}
