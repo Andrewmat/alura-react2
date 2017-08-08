@@ -11,12 +11,12 @@ class Login extends Component {
       'no_login' : 'Você precisa estar logado para acessar esse endereço'
     };
     const msgCode = props.location && props.location.search && parseQuery(props.location.search)['error_msg'];
-    
+
     this.state = {
       msg: msgBundle[msgCode] || ''
     };
   }
-  
+
   sendForm(e) {
     e.preventDefault();
     fetch('http://localhost:8080/api/public/login', {
@@ -44,7 +44,7 @@ class Login extends Component {
         this.setState({ msg: error.message });
       })
   }
-  
+
   render() {
     return (
       <div className="login-box">

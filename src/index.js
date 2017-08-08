@@ -19,7 +19,8 @@ ReactDOM.render(
     <App>
       <Switch>
         <Route exact path="/" component={Login} />
-        <Route path="/timeline" render={checkAuth(<Timeline/>)} />
+        <Route exact path="/timeline" render={checkAuth(<Timeline/>)} />
+        <Route path="/timeline/:user" component={Timeline} />
         <Route path="/logout" component={Logout} />
       </Switch>
     </App>
