@@ -3,7 +3,7 @@ import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import PhotoItem from './PhotoItem';
-import { requestServer } from '../utils/Auth';
+import { fetchAuth } from '../services/fetch'
 
 export default class Timeline extends Component {
   constructor() {
@@ -75,7 +75,7 @@ export default class Timeline extends Component {
     } else {
       endpoint = `/fotos`;
     }
-    requestServer(endpoint)
+    fetchAuth(endpoint)
       .then(result => {
         return result.json();
       })
@@ -85,7 +85,7 @@ export default class Timeline extends Component {
   }
 
   likePhoto({id}) {
-    return requestServer(`/fotos/${id}/like`, { method: 'POST' })
+    return fetchAuth(`fotos/${id}/like`, { method: 'POST' })
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -96,7 +96,7 @@ export default class Timeline extends Component {
   }
 
   commentPhoto({id, comment}) {
-    return requestServer(`/fotos/${id}/comment`, {
+    return fetchAuth(`fotos/${id}/comment`, {
       method: 'POST',
       body: JSON.stringify({
         texto: comment

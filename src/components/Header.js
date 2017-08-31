@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PubSub from 'pubsub-js';
 import { Link } from 'react-router-dom';
 
-import { requestServer } from '../utils/Auth';
+import { fetchPublic } from '../services/fetch';
 
 export default class Header extends Component {
   submitSearch(e) {
@@ -10,7 +10,7 @@ export default class Header extends Component {
     if (!this.querySearch.value) {
       PubSub.publish('photo-search-exit');
     } else {
-      requestServer(`/public/fotos/${this.querySearch.value}`)
+      fetchPublic(`/public/fotos/${this.querySearch.value}`)
         .then(response => {
           if (response.ok) {
             return response.json();

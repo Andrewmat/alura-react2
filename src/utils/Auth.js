@@ -1,23 +1,24 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 
-const requestServer = (endpoint, data) => {
-  data = data || {};
-  data.headers = data.headers || new Headers();
-  data.headers.set('X-AUTH-TOKEN', localStorage.getItem('auth-token'));
-  return fetch(`http://localhost:8080/api${endpoint}`, data)
+const authToken = () => {
+  return localStorage.getItem('auth-token');
 }
 
-const checkAuth = (component) => {
+const checkAuth = () => {
+  return authToken() !== null;
+}
+
+const authComponent = (component) => {
   return () => {
-    if (localStorage.getItem('auth-token') === null) {
-      return (
-        <Redirect to="/?error_msg=no_login"/>
-      )
-    } else {
-      return component;
-    }
+    return checkAuth()
+      ? component
+      : (<Redirect to="/?error_msg=no_login"/>);
   }
 }
 
-export { checkAuth, requestServer };
+export {
+  authToken,
+  checkAuth,
+  authComponent
+};

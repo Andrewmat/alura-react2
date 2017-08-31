@@ -7,7 +7,7 @@ import App from './App';
 import Login from './components/Login';
 import Logout from './components/Logout';
 import Timeline from './components/Timeline';
-import { checkAuth } from './utils/Auth';
+import { authComponent } from './utils/Auth';
 import registerServiceWorker from './registerServiceWorker';
 
 import './css/login.css';
@@ -19,7 +19,7 @@ ReactDOM.render(
     <App>
       <Switch>
         <Route exact path="/" component={Login} />
-        <Route exact path="/timeline" render={checkAuth(<Timeline/>)} />
+        <Route exact path="/timeline" render={authComponent(<Timeline/>)} />
         <Route path="/timeline/:user" component={Timeline} />
         <Route path="/logout" component={Logout} />
       </Switch>

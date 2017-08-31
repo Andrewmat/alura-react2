@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { parse as parseQuery } from 'query-string';
+import { fetchPublic } from '../services/fetch';
 
 class Login extends Component {
 
@@ -19,7 +20,7 @@ class Login extends Component {
 
   sendForm(e) {
     e.preventDefault();
-    fetch('http://localhost:8080/api/public/login', {
+    fetchPublic('login', {
       method: 'POST',
       headers: new Headers({
         'Content-type': 'application/json'
