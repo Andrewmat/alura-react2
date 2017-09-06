@@ -1,24 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { BrowserRouter, Switch } from 'react-router-dom';
+import { BrowserRouter, Switch, Redirect } from 'react-router-dom';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 
 import App from './App';
 import Login from './components/Login';
 import Logout from './components/Logout';
 import Timeline from './components/Timeline';
-import TimelineStore from 'TimelineStore';
-import { checkAuth } from './utils/Auth';
+
+import timelineReducer from './reducers/timeline';
+import { isAuth } from './utils/Auth';
+
 import registerServiceWorker from './registerServiceWorker';
 
 import './css/login.css';
 import './css/reset.css';
 import './css/timeline.css';
 
-const timelineStore = new TimelineStore();
+const timelineStore = createStore(timelineReducer, applyMiddleware(thunk));
 
 const authComponent = (component) => {
-  return checkAuth()
+  return isAuth()
     ? component
     : (<Redirect to="/?error_msg=no_login"/>);
 }

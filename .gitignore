@@ -68,6 +68,9 @@ typings/
 # production
 /build
 
+# IDEs
+.vscode
+
 # misc
 .DS_Store
 .env.local
