@@ -3,7 +3,7 @@ import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import PhotoItem from './PhotoItem';
-import { fetchAuth } from '../services/fetch'
+import { fetchAuth } from '../services/fetch';
 
 export default class Timeline extends Component {
   constructor() {
@@ -30,7 +30,11 @@ export default class Timeline extends Component {
 
     this.subscriptions.push(
       PubSub.subscribe('photo-like', (topic, likeData) => {
-        const photo = this.state.photos.find(p => p.id === likeData.id);
+        const photo = this.state.photos.find(ph => ph.id === likeData.id);
+        if (!photo) {
+          throw new Error('Like in undefined photo');
+        }
+        photo.likeada = !photo.likeada;
         if (!photo.likers.includes(l => l.login === likeData.liker.login)) {
           photo.likers.push(likeData.liker);
         } else {
@@ -42,6 +46,9 @@ export default class Timeline extends Component {
     this.subscriptions.push(
       PubSub.subscribe('photo-comment', (topic, commentData) => {
         const photo = this.state.photos.find(p => p.id === commentData.id);
+        if (!photo) {
+          throw new Error('Like in undefined photo');
+        }
         photo.comentarios.push(commentData.comment);
         this.setState({photo: this.state.photo});
       })

@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import PubSub from 'pubsub-js';
 
 class PhotoUpdates extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      liked: this.props.photo.likeada
-    };
-  }
 
   likeEvent(e) {
     e.preventDefault();
@@ -16,13 +10,7 @@ class PhotoUpdates extends Component {
       id: this.props.photo.id
     })
       .then(liker => {
-        this.setState({
-          liked: !this.state.liked
-        });
         PubSub.publish('photo-like', { id: this.props.photo.id, liker })
-      })
-      .catch(e => {
-        alert(e.message);
       });
   }
 
@@ -34,16 +22,13 @@ class PhotoUpdates extends Component {
     })
       .then(comment => {
         PubSub.publish('photo-comment', { id: this.props.photo.id, comment });
-      })
-      .catch(e => {
-        alert(e.message);
-      })
+      });
   }
 
   render() {
     return (
       <section className="fotoAtualizacoes">
-        <button onClick={this.likeEvent.bind(this)} className={this.state.liked ? 'fotoAtualizacoes-like-ativo' : 'fotoAtualizacoes-like'}>Likar</button>
+        <button onClick={this.likeEvent.bind(this)} className={this.props.photo.likeada ? 'fotoAtualizacoes-like-ativo' : 'fotoAtualizacoes-like'}>Likar</button>
         <form className="fotoAtualizacoes-form" onSubmit={this.commentEvent.bind(this)}>
           <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" ref={input => this.comment = input} />
           <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
@@ -54,26 +39,12 @@ class PhotoUpdates extends Component {
 }
 
 class PhotoInfo extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      likers: this.props.photo.likers,
-      comments: this.props.photo.comentarios
-    };
-    this.subscriptions = [];
-  }
-
-  componentWillUnmount() {
-    this.subscriptions.forEach(sub => PubSub.unsubscribe(sub));
-    this.subscriptions = [];
-  }
-
   render() {
     return (
       <div className="foto-info">
         <div className="foto-info-likes">
           {
-            this.state.likers.map(liker => (
+            this.props.photo.likers.map(liker => (
               <span key={liker.login}>
                 <Link to={`/timeline/${liker.login}`}>{liker.login}</Link>,
               </span>
@@ -88,7 +59,7 @@ class PhotoInfo extends Component {
 
         <ul className="foto-info-comentarios">
           {
-            this.state.comments.map(comment => (
+            this.props.photo.comentarios.map(comment => (
               <li className="comentario" key={comment.id}>
                 <Link to={`/timeline/${comment.login}`} className="foto-info-autor">{comment.login}</Link>
                 {comment.texto}
