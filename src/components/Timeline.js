@@ -3,7 +3,6 @@ import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import PhotoItem from './PhotoItem';
-import { fetchAuth } from '../services/fetch';
 
 export default class Timeline extends Component {
   constructor() {
@@ -16,6 +15,9 @@ export default class Timeline extends Component {
   }
 
   componentWillMount() {
+    this.props.store.subscribe(photos => {
+      this.setState({photos});
+    })
     this.subscriptions.push(
       PubSub.subscribe('photo-search', (topic, photos) => {
         this.setState({ photos });
@@ -25,32 +27,6 @@ export default class Timeline extends Component {
       PubSub.subscribe('photo-search-exit', (topic) => {
         this.user = '';
         this.fetchTimelineData();
-      })
-    );
-
-    this.subscriptions.push(
-      PubSub.subscribe('photo-like', (topic, likeData) => {
-        const photo = this.state.photos.find(ph => ph.id === likeData.id);
-        if (!photo) {
-          throw new Error('Like in undefined photo');
-        }
-        photo.likeada = !photo.likeada;
-        if (!photo.likers.includes(l => l.login === likeData.liker.login)) {
-          photo.likers.push(likeData.liker);
-        } else {
-          photo.likers = photo.likers.filter(l => l.login !== likeData.liker.login);
-        }
-        this.setState({photos: this.state.photos});
-      })
-    )
-    this.subscriptions.push(
-      PubSub.subscribe('photo-comment', (topic, commentData) => {
-        const photo = this.state.photos.find(p => p.id === commentData.id);
-        if (!photo) {
-          throw new Error('Like in undefined photo');
-        }
-        photo.comentarios.push(commentData.comment);
-        this.setState({photo: this.state.photo});
       })
     );
   }
@@ -82,43 +58,15 @@ export default class Timeline extends Component {
     } else {
       endpoint = `/fotos`;
     }
-    fetchAuth(endpoint)
-      .then(result => {
-        return result.json();
-      })
-      .then(photos => {
-        this.setState({ photos });
-      });
+    this.props.store.fetchPhotos(endpoint);
   }
 
   likePhoto({id}) {
-    return fetchAuth(`fotos/${id}/like`, { method: 'POST' })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Não foi possível realizar o like na foto');
-        }
-      });
+    return this.props.store.likePhoto({id});
   }
 
   commentPhoto({id, comment}) {
-    return fetchAuth(`fotos/${id}/comment`, {
-      method: 'POST',
-      body: JSON.stringify({
-        texto: comment
-      }),
-      headers: new Headers({
-        'Content-type': 'application/json'
-      })
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Erro ao inserir comentário na foto');
-        }
-      });
+    return this.props.store.commentPhoto({id, comment});
   }
 
   render() {
