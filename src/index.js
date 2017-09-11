@@ -29,7 +29,7 @@ const authComponent = (component) => {
 
 ReactDOM.render(
   <BrowserRouter>
-    <App>
+    <App store={timelineStore}>
       <Switch>
         <Route exact path="/" component={Login} />
         <Route exact path="/timeline" render={() => authComponent(<Timeline store={timelineStore}/>)} />

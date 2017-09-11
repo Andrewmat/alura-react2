@@ -6,7 +6,7 @@ class App extends Component {
     return (
       <div id="root">
         <div className="main">
-          <Header />
+          <Header store={this.props.store} />
           {this.props.children}
         </div>
       </div>

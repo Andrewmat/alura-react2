@@ -3,6 +3,7 @@ import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import PhotoItem from './PhotoItem';
+import Message from './Message';
 import api from '../logic/TimelineApi';
 
 export default class Timeline extends Component {
@@ -17,8 +18,9 @@ export default class Timeline extends Component {
 
   componentWillMount() {
     this.props.store.subscribe(() => {
-      this.setState({ photos: this.props.store.getState() });
-    })
+      let { photos, message } = this.props.store.getState();
+      this.setState({ photos, message });
+    });
     this.subscriptions.push(
       PubSub.subscribe('photo-search', (topic, photos) => {
         this.setState({ photos });
@@ -78,8 +80,10 @@ export default class Timeline extends Component {
             transitionEnterTimeout={500}
             transitionLeaveTimeout={300}>
             {
-              this.state.photos.map(p => (
-                <PhotoItem
+              this.state.message
+                ? <Message value={this.state.message}/>
+                : this.state.photos.map(p => (
+                  <PhotoItem
                     key={p.id}
                     photo={p}
                     onLike={this.likePhoto.bind(this)}

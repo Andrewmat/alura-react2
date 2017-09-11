@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PubSub from 'pubsub-js';
 import { Link } from 'react-router-dom';
 
-import { fetchPublic } from '../services/fetch';
+import api from '../logic/TimelineApi';
 
 export default class Header extends Component {
   submitSearch(e) {
@@ -10,20 +10,7 @@ export default class Header extends Component {
     if (!this.querySearch.value) {
       PubSub.publish('photo-search-exit');
     } else {
-      fetchPublic(`/public/fotos/${this.querySearch.value}`)
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Não foi possível completar a busca');
-          }
-        })
-        .then(searchResult => {
-          PubSub.publish('photo-search', searchResult);
-        })
-        .catch(e => {
-          alert(e.message);
-        })
+      this.props.store.dispatch(api.searchPhotos({query: this.querySearch.value}));
     }
   }
 

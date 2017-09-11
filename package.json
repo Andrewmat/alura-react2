@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "immutable": "^3.8.1",
     "pubsub-js": "^1.5.7",
     "query-string": "^5.0.0",
     "react": "^15.6.1",
