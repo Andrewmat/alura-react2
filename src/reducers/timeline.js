@@ -2,25 +2,27 @@ import { List } from 'immutable';
 
 export default function timeline(state = {photos: new List(), message: ''}, action) {
   if (action.type === 'LIST') {
-    return { photos: new List(action.payload.photos) };
+    return list(state, action);
   }
 
   if (action.type === 'LIKE') {
-    return { photos: likeAction(state, action) };
+    return like(state, action);
   }
 
   if (action.type === 'COMMENT') {
-    return { photos: commentAction(state, action) };
-  }
-
-  if (action.type === 'ALERT') {
-    return { message: action.payload.message };
+    return comment(state, action);
   }
 
   return state;
 };
 
-const likeAction = (state, action) => {
+const list = (state, action) => {
+  return {
+    photos: new List(action.payload.photos)
+  };
+}
+
+const like = (state, action) => {
   let { id, liker } = action.payload;
 
   return changePhoto(state.photos, id, photo => {
@@ -38,9 +40,9 @@ const likeAction = (state, action) => {
   });
 }
 
-const commentAction = (state, action) => {
+const comment = (state, action) => {
   let { id, comment } = action.payload;
-  return changePhoto(state, id, photo => ({
+  return changePhoto(state.photos, id, photo => ({
     comentarios: photo.comentarios.concat(comment)
   }));
 }
@@ -52,5 +54,7 @@ function changePhoto(list, id, propCallback) {
     throw new Error('Undefined photo');
   }
   let updPhoto = Object.assign({}, photo, propCallback(photo));
-  return list.set(photoIndex, updPhoto);
+  return {
+    photos: list.set(photoIndex, updPhoto)
+  };
 }

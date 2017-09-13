@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import Header from './components/Header';
+import Timeline from './components/Timeline';
 
 class App extends Component {
   render() {
     return (
       <div id="root">
         <div className="main">
-          <Header store={this.props.store} />
-          {this.props.children}
+          <Header store={this.context.store} />
+          <Timeline {...this.props} />
         </div>
       </div>
     );
   }
+}
+
+App.contextTypes = {
+  store: PropTypes.object.isRequired
 }
 
 export default App;

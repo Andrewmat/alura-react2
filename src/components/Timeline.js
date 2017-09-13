@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
@@ -6,45 +7,24 @@ import PhotoItem from './PhotoItem';
 import Message from './Message';
 import api from '../logic/TimelineApi';
 
-export default class Timeline extends Component {
-  constructor() {
-    super();
+class Timeline extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
       photos: []
     };
-    this.user = '';
+    this.user = props.user || '';
     this.subscriptions = [];
   }
 
-  componentWillMount() {
-    this.props.store.subscribe(() => {
-      let { photos, message } = this.props.store.getState();
-      this.setState({ photos, message });
-    });
-    this.subscriptions.push(
-      PubSub.subscribe('photo-search', (topic, photos) => {
-        this.setState({ photos });
-      })
-    );
-    this.subscriptions.push(
-      PubSub.subscribe('photo-search-exit', (topic) => {
-        this.user = '';
-        this.fetchTimelineData();
-      })
-    );
-  }
-
   componentDidMount() {
-    if (this.props.match && this.props.match.params && this.props.match.params.user) {
-      this.user = this.props.match.params.user;
-    }
     this.fetchTimelineData();
   }
 
   componentWillReceiveProps(nextProps) {
-    let nextUser = nextProps.match && nextProps.match.params && nextProps.match.params.user
-    if (nextUser == null || nextUser !== this.user) {
-      this.user = nextUser || '';
+    let nextUser = nextProps.match && nextProps.match.params && nextProps.match.params.user;
+    if (nextUser !== this.user) {
+      this.user = nextUser;
       this.fetchTimelineData();
     }
   }
@@ -54,22 +34,13 @@ export default class Timeline extends Component {
     this.subscriptions = [];
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
+
   fetchTimelineData() {
     let endpoint;
-    if (this.user) {
-      endpoint = `/public/fotos/${this.user}`;
-    } else {
-      endpoint = `/fotos`;
-    }
-    this.props.store.dispatch(api.fetchPhotos(endpoint));
-  }
-
-  likePhoto({id}) {
-    return this.props.store.dispatch(api.likePhoto({id}));
-  }
-
-  commentPhoto({id, comment}) {
-    return this.props.store.dispatch(api.commentPhoto({id, comment}));
+    this.props.list(this.user);
   }
 
   render() {
@@ -80,14 +51,14 @@ export default class Timeline extends Component {
             transitionEnterTimeout={500}
             transitionLeaveTimeout={300}>
             {
-              this.state.message
-                ? <Message value={this.state.message}/>
-                : this.state.photos.map(p => (
+              this.props.message
+                ? <Message value={this.props.message}/>
+                : this.props.photos.map(p => (
                   <PhotoItem
                     key={p.id}
                     photo={p}
-                    onLike={this.likePhoto.bind(this)}
-                    onComment={this.commentPhoto.bind(this)}/>
+                    onLike={this.props.likePhoto}
+                    onComment={this.props.commentPhoto}/>
               ))
             }
         </ReactCSSTransitionGroup>
@@ -95,3 +66,20 @@ export default class Timeline extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    photos: state.timeline.photos,
+    message: state.header.message
+  };
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    list: (user) => dispatch(api.listPhotos(user)),
+    likePhoto: ({id}) => dispatch(api.likePhoto({id})),
+    commentPhoto: ({id, comment}) => dispatch(api.commentPhoto({id, comment}))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Timeline);

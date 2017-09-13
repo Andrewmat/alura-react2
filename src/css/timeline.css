@@ -1,3 +1,7 @@
+:root {
+  --error-bg-color: #EDB6B6;
+  --error-color: #703737;
+}
 html,body {
   height: 100%;
 }
@@ -15,9 +19,9 @@ body {
 
 .alert {
   display: block;
-  background: #caa;
+  background: var(--error-bg-color);
   border: 1px solid #efefef;
-  color: #722;
+  color: var(--error-color);
   margin: 2em auto;
   max-width: 550px;
   text-align: center;
@@ -64,6 +68,11 @@ body {
   background: #fff;
   outline: 1px solid #ccc;
   color: #222;
+}
+
+.header-busca-campo-alert {
+  background-color: var(--error-bg-color);
+  color: var(--error-color);
 }
 
 .header-busca-submit {
